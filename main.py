@@ -1,7 +1,11 @@
+# Core librairies
 from time import sleep
 
+# System librairies
 import sys
+import os
 
+# Scraping libraries
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -11,20 +15,117 @@ def word_replace(filename, old_word, new_word):
     file = open(filename, 'r', encoding='utf-8')
     filedata = file.read()
     data = filedata.replace(old_word, new_word)
-    file.close()
     file = open(filename, 'w', encoding='utf-8')
     file.write(data)
+
+
+def save_characteristic_html(title, manufacturer, list_char_name, list_char_value):
+    directory = title
+    os.makedirs(directory, exist_ok=True)
+    file_path = os.path.join(directory, 'caractéristique.html')
+
+    file = open(file_path, 'w', encoding='utf-8')
+    file.write('<p><b>Caractéristiques:</b></p>')
+    file.write('<ul>')
+    file.write('<li>Marque: ' + manufacturer + '</li><li>Qualité Premium</li><li>Neuf</li><li>Garantie 2 ans</li>')
+    for i in range(len(list_char_name)):
+        file.write('<li>' + str(list_char_name[i]) + ' ' + str(list_char_value[i])+'</li>')
+    file.write('</ul>')
     file.close()
 
 
-def save_data(title, manufacturer, article, ref_producer_list, char_table_name, char_table_value, row_brand_model):
+def save_description_html(title, manufacturer, article, ref_producer_list, char_table_name, char_table_value, row_brand_model):
     list_ref = []
     list_producer = []
     list_char_name = []
     list_char_value = []
     list_brand = []
     list_model = []
-    list_type = []
+    producer_dict = {}
+
+    for element in ref_producer_list:
+        list_ref.append(element.find_element(By.TAG_NAME, 'a').text)
+        list_producer.append(element.find_element(By.CLASS_NAME, '_producer_1s9a0_56').text)
+
+    for char_name in char_table_name:
+        list_char_name.append(char_name.text)
+
+    for char_value in char_table_value:
+        list_char_value.append(char_value.text)
+
+    for i in range(0, len(row_brand_model), 5):
+        list_brand.append(row_brand_model[0 + i])
+        list_model.append(row_brand_model[1 + i])
+
+    directory = title
+    os.makedirs(directory, exist_ok=True)
+    file_path = os.path.join(directory, 'description.html')
+
+    file = open(file_path, 'w', encoding='utf-8')
+
+    file.write('<h3>')
+    file.write(article + ' ' + str(list_char_value[0]) + 'V ' + str(list_char_value[1]) + 'kW ' + str(
+        list_char_value[5]) + ' dents ')
+
+    for i in range(5):
+        ref = list_ref[i]
+        prod = list_producer[i]
+        if prod in producer_dict:
+            producer_dict[prod].append(ref)
+        else:
+            producer_dict[prod] = [ref]
+
+    combined = [f"{prod} {' '.join(refs)}" for prod, refs in producer_dict.items()]
+    result = ", ".join(combined)
+    file.write(result)
+    file.write('</h3>')
+
+    file.write('<b>Les engagements AutoTruck42:</b><br>')
+    file.write('<ul>')
+    file.write('<li>Boutique 100% française</li><li>Situé à Mably dans la Loire 42300</li>')
+    file.write('<li>Un professionnel au téléphone du Lundi au Vendredi 09h00/16h00</li>')
+    file.write('<li>Une livraison en 24/48h (Point relais, Express en 24h)</li>')
+    file.write('<li>Traitement de la commande le jour même avant 16 h00</li>')
+    file.write('<li>Une réponse à toutes vos en 2h Max de 9h00 à 16h00 et dans la journée 7jrs/7 de 6h00 à 22h00</li>')
+    file.write('<li>Des produits de qualité au normes FR & EU</li>')
+    file.write('<li>Garantie 2 ans</li>')
+    file.write('</ul>')
+
+    file.write('<br><b>Caractéristique</b><br>')
+    file.write('<ul>')
+    file.write('<li>Marque: ' + manufacturer + '</li><li>Qualité Premium</li>')
+    file.write('<li>Neuf</li><li>Garantie 2 ans</li>')
+    for j in range(len(list_char_name)):
+        file.write('<li>' + str(list_char_name[j]) + ' ' + str(list_char_value[j]) + '</li>')
+    file.write('</ul>')
+
+    file.write('<br><b>Référence équivalente</b><br>')
+    file.write('<ul>')
+    for i in range(len(list_ref)):
+        file.write('<li>' + str(list_ref[i]) + ' ' + str(list_producer[i]) + '</li>')
+    file.write('</ul>')
+
+    file.write('<br><b>Compatible avec:</b><br>')
+    file.write('<ul>')
+    for k in range(len(list_brand)):
+        file.write('<li>' + str(list_brand[k]) + ' ' + str(list_model[k]) + '</li>')
+    file.write('</ul>')
+
+    file.close()
+    word_replace(file_path, 'Demarreur', 'Démarreur')
+    word_replace(file_path, 'demarreur', 'démarreur')
+    word_replace(file_path, 'filetes', 'filetés')
+    word_replace(file_path, 'Tention', 'Tension')
+    word_replace(file_path, 'qty.', 'qté.')
+
+
+def save_description_txt(title, manufacturer, article, ref_producer_list, char_table_name, char_table_value, row_brand_model):
+    list_ref = []
+    list_producer = []
+    list_char_name = []
+    list_char_value = []
+    list_brand = []
+    list_model = []
     producer_dict = {}
 
     for element in ref_producer_list:
@@ -40,9 +141,11 @@ def save_data(title, manufacturer, article, ref_producer_list, char_table_name, 
     for i in range(0, len(row_brand_model), 5):
         list_brand.append(row_brand_model[0+i])
         list_model.append(row_brand_model[1+i])
-        list_type.append(row_brand_model[2+i])
 
-    file = open(f'{title}.txt', 'w', encoding='utf-8')
+    directory = title
+    os.makedirs(directory, exist_ok=True)
+    file_path = os.path.join(directory, f'{title}.txt')
+    file = open(file_path, 'w', encoding='utf-8')
 
     file.write(article + ' ' + str(list_char_value[0]) + 'V ' + str(list_char_value[1]) + 'kW ' + str(list_char_value[5]) + ' dents ')
 
@@ -58,25 +161,31 @@ def save_data(title, manufacturer, article, ref_producer_list, char_table_name, 
     result = ", ".join(combined)
     file.write(result)
 
-    file.write('\n\nRéférence Equivalente\n\n')
-    for i in range(len(list_ref)):
-        file.write(str(list_ref[i]) + ' ' + str(list_producer[i])+'\n')
-
-    file.write('\n\n#Caractéristique\n\n')
+    file.write('\n\nCaractéristique\n\n')
     file.write('Marque: ' + manufacturer + '\nQualité Premium\nNeuf\nGarantie 2 ans\n')
     for j in range(len(list_char_name)):
         file.write(str(list_char_name[j]) + ' ' + str(list_char_value[j])+'\n')
 
-    file.write('\n\n#Applications\n\n')
+    file.write('\n\nRéférence équivalente\n\n')
+    for i in range(len(list_ref)):
+        file.write(str(list_ref[i]) + ' ' + str(list_producer[i])+'\n')
+
+    file.write('\n\nCompatible avec:\n\n')
     for k in range(len(list_brand)):
-        file.write(str(list_brand[k]) + ' ' + str(list_model[k])+'\n')
+        file.write(str(list_brand[k]) + ' ' + str(list_model[k]) + '\n')
 
     file.close()
-    word_replace(f'{title}.txt', 'Demarreur', 'Démarreur')
-    word_replace(f'{title}.txt', 'demarreur', 'démarreur')
-    word_replace(f'{title}.txt', 'filetes', 'filetés')
-    word_replace(f'{title}.txt', 'Tention', 'Tension')
-    word_replace(f'{title}.txt', 'qty.', 'qté.')
+    word_replace(file_path, 'Demarreur', 'Démarreur')
+    word_replace(file_path, 'demarreur', 'démarreur')
+    word_replace(file_path, 'filetes', 'filetés')
+    word_replace(file_path, 'Tention', 'Tension')
+    word_replace(file_path, 'qty.', 'qté.')
+
+    save_characteristic_html(title, manufacturer, list_char_name, list_char_value)
+    word_replace(os.path.join(directory, 'caractéristique.html'), 'demarreur', 'démarreur')
+    word_replace(os.path.join(directory, 'caractéristique.html'), 'filetes', 'filetés')
+    word_replace(os.path.join(directory, 'caractéristique.html'), 'Tention', 'Tension')
+    word_replace(os.path.join(directory, 'caractéristique.html'), 'qty.', 'qté.')
 
 
 def scrape(url):
@@ -87,7 +196,7 @@ def scrape(url):
 
     browser = webdriver.Chrome(options=options)
     browser.get(url)
-    sleep(2)
+    sleep(3)
 
     title = browser.find_element(By.CLASS_NAME, 'product-name').text
 
@@ -104,7 +213,6 @@ def scrape(url):
     applications_list = browser.find_elements(By.CLASS_NAME, 'usage-el')
 
     for item in applications_list:
-        # row = []
         item.click()
         sleep(1)
         brand_model = browser.find_element(By.CLASS_NAME, 'table-striped')
@@ -112,7 +220,8 @@ def scrape(url):
         for row in rows:
             row_brand_model.append(row.text)
 
-    save_data(title, manufacturer, article, element_list, char_table_name, char_table_value, row_brand_model)
+    save_description_txt(title, manufacturer, article, element_list, char_table_name, char_table_value, row_brand_model)
+    save_description_html(title, manufacturer, article, element_list, char_table_name, char_table_value, row_brand_model)
     browser.quit()
 
 
