@@ -138,14 +138,9 @@ def save_description_txt(title, manufacturer, article, ref_producer_list, char_t
     for char_value in char_table_value:
         list_char_value.append(char_value.text)
 
-    list_brand.append(row_brand_model[0])
-    list_model.append(row_brand_model[1])
     for i in range(0, len(row_brand_model), 5):
-        if list_model[i] in list_model:
-            continue
-        else:
-            list_brand.append(row_brand_model[0+i])
-            list_model.append(row_brand_model[1+i])
+list_brand.append(row_brand_model[0+i])
+           list_model.append(row_brand_model[1+i])
 
     directory = title
     os.makedirs(directory, exist_ok=True)
