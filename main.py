@@ -44,8 +44,15 @@ def save_description_html(title, manufacturer, article, list_ref, list_producer,
     file = open(file_path, 'w', encoding='utf-8')
 
     file.write('<h3>')
-    file.write(article + ' ' + str(list_char_value[0]) + 'V ' + str(list_char_value[1]) + 'kW ' + str(
-        list_char_value[5]) + ' dents ')
+    if 'Tention [ V ]' in list_char_name:
+        index = list_char_name.index('Tention [ V ]')
+        file.write(article + ' ' + str(list_char_value[index]) + 'V ')
+    if 'Puissance [ kW ]' in list_char_name:
+        index = list_char_name.index('Puissance [ kW ]')
+        file.write(str(list_char_value[index]) + 'kW ')
+    if 'Nombre de dents [ qty. ]' in list_char_name:
+        index = list_char_name.index('Nombre de dents [ qty. ]')
+        file.write(str(list_char_value[index]) + ' dents ')
 
     for i in range(5):
         ref = list_ref[i]
@@ -143,7 +150,15 @@ def save_description_txt(title, manufacturer, article, ref_producer_list, char_t
     file_path = os.path.join(directory, f'{title}.txt')
     file = open(file_path, 'w', encoding='utf-8')
 
-    file.write(article + ' ' + str(list_char_value[0]) + 'V ' + str(list_char_value[1]) + 'kW ' + str(list_char_value[5]) + ' dents ')
+    if 'Tention [ V ]' in list_char_name:
+        index = list_char_name.index('Tention [ V ]')
+        file.write(article + ' ' + str(list_char_value[index]) + 'V ')
+    if 'Puissance [ kW ]' in list_char_name:
+        index = list_char_name.index('Puissance [ kW ]')
+        file.write(str(list_char_value[index]) + 'kW ')
+    if 'Nombre de dents [ qty. ]' in list_char_name:
+        index = list_char_name.index('Nombre de dents [ qty. ]')
+        file.write(str(list_char_value[index]) + ' dents ')
 
     for i in range(5):
         ref = list_ref[i]
