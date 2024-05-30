@@ -54,13 +54,22 @@ def save_description_html(title, manufacturer, article, list_ref, list_producer,
         index = list_char_name.index('Nombre de dents [ qty. ]')
         file.write(str(list_char_value[index]) + ' dents ')
 
-    for i in range(5):
-        ref = list_ref[i]
-        prod = list_producer[i]
-        if prod in producer_dict:
-            producer_dict[prod].append(ref)
-        else:
-            producer_dict[prod] = [ref]
+    if len(list_ref) >= 5:
+        for i in range(5):
+            ref = list_ref[i]
+            prod = list_producer[i]
+            if prod in producer_dict:
+                producer_dict[prod].append(ref)
+            else:
+                producer_dict[prod] = [ref]
+    else:
+        for i in range(len(list_ref)):
+            ref = list_ref[i]
+            prod = list_producer[i]
+            if prod in producer_dict:
+                producer_dict[prod].append(ref)
+            else:
+                producer_dict[prod] = [ref]
 
     combined = [f"{prod} {' '.join(refs)}" for prod, refs in producer_dict.items()]
     result = ", ".join(combined)
@@ -166,13 +175,22 @@ def save_description_txt(title, manufacturer, article, ref_producer_list, char_t
     else:
         file.write(' ')
 
-    for i in range(5):
-        ref = list_ref[i]
-        prod = list_producer[i]
-        if prod in producer_dict:
-            producer_dict[prod].append(ref)
-        else:
-            producer_dict[prod] = [ref]
+    if len(list_ref) >= 5:
+        for i in range(5):
+            ref = list_ref[i]
+            prod = list_producer[i]
+            if prod in producer_dict:
+                producer_dict[prod].append(ref)
+            else:
+                producer_dict[prod] = [ref]
+    else:
+        for i in range(len(list_ref)):
+            ref = list_ref[i]
+            prod = list_producer[i]
+            if prod in producer_dict:
+                producer_dict[prod].append(ref)
+            else:
+                producer_dict[prod] = [ref]
 
     combined = [f"{prod} {' '.join(refs)}" for prod, refs in producer_dict.items()]
     result = ", ".join(combined)
