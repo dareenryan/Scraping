@@ -9,6 +9,7 @@ import os
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+import requests
 
 
 def word_replace(filename, old_word, new_word):
@@ -17,6 +18,21 @@ def word_replace(filename, old_word, new_word):
     data = filedata.replace(old_word, new_word)
     file = open(filename, 'w', encoding='utf-8')
     file.write(data)
+
+
+def save_image(title, images, price):
+    directory = f'{title}/images'
+    os.makedirs(directory, exist_ok=True)
+    image = []
+    for i in images:
+        image.append(i.find_element(By.TAG_NAME, 'img'))
+    for idx, img in enumerate(image):
+        src = img.get_attribute('src')
+        if src:
+            img_data = requests.get(src).content
+            with open(f'directory/image_{idx}', 'wb') as img_file:
+                img_file.write(img_data)
+
 
 
 def save_characteristic_html(title, manufacturer, list_char_name, list_char_value):
@@ -238,6 +254,10 @@ def scrape(url):
 
     manufacturer = browser.find_element(By.CSS_SELECTOR, '[itemprop="manufacturer"]').text
 
+    images = browser.find_elements(By.CSS_SELECTOR, '[itemprop="image"]')
+
+    price = browser.find_element(By.CLASS_NAME, 'price-product')
+
     article = browser.find_element(By.CLASS_NAME, 'categories').text
 
     element_list = browser.find_elements(By.CLASS_NAME, '_referenceRow_1s9a0_47')
@@ -257,6 +277,7 @@ def scrape(url):
             row_brand_model.append(row.text)
 
     save_description_txt(title, manufacturer, article, element_list, char_table_name, char_table_value, row_brand_model)
+    save_image(title, images, price)
     browser.quit()
 
 
