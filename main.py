@@ -9,30 +9,54 @@ import os
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-import requests
+
+# Other functions
+from image import save_image
+from word_replace import word_replace
 
 
-def word_replace(filename, old_word, new_word):
-    file = open(filename, 'r', encoding='utf-8')
-    filedata = file.read()
-    data = filedata.replace(old_word, new_word)
-    file = open(filename, 'w', encoding='utf-8')
-    file.write(data)
-
-
-def save_image(title, images, price):
-    directory = f'{title}/images'
+def save_meta(title, price, article, list_ref, list_producer, list_char_name, list_char_value):
+    producer_dict = {}
+    prix = price.split(' ')
+    directory = title
     os.makedirs(directory, exist_ok=True)
-    image = []
-    for i in images:
-        image.append(i.find_element(By.TAG_NAME, 'img'))
-    for idx, img in enumerate(image):
-        src = img.get_attribute('src')
-        if src:
-            img_data = requests.get(src).content
-            with open(f'directory/image_{idx}', 'wb') as img_file:
-                img_file.write(img_data)
+    file_path = os.path.join(directory, 'meta.txt')
 
+    file = open(file_path, 'w', encoding='utf-8')
+
+    if 'Tention [ V ]' in list_char_name:
+        index = list_char_name.index('Tention [ V ]')
+        file.write(article + ' ' + str(list_char_value[index]) + 'V ')
+    if 'Puissance [ kW ]' in list_char_name:
+        index = list_char_name.index('Puissance [ kW ]')
+        file.write(str(list_char_value[index]) + 'kW ')
+    if 'Nombre de dents [ qty. ]' in list_char_name:
+        index = list_char_name.index('Nombre de dents [ qty. ]')
+        file.write(str(list_char_value[index]) + ' dents ')
+
+    if len(list_ref) >= 6:
+        for i in range(6):
+            ref = list_ref[i]
+            prod = list_producer[i]
+            if prod in producer_dict:
+                producer_dict[prod].append(ref)
+            else:
+                producer_dict[prod] = [ref]
+    else:
+        for i in range(len(list_ref)):
+            ref = list_ref[i]
+            prod = list_producer[i]
+            if prod in producer_dict:
+                producer_dict[prod].append(ref)
+            else:
+                producer_dict[prod] = [ref]
+
+    combined = [f"{prod} {', '.join(refs)}" for prod, refs in producer_dict.items()]
+    result = ", ".join(combined)
+    file.write(result)
+    file.write(' à ' + str(float(prix[0])*1.5) + prix[1])
+    file.write(' sur notre boutique en ligne. Livraison express 24h')
+    word_replace(file_path, 'Demarreur', 'Démarreur')
 
 
 def save_characteristic_html(title, manufacturer, list_char_name, list_char_value):
@@ -48,6 +72,10 @@ def save_characteristic_html(title, manufacturer, list_char_name, list_char_valu
         file.write('<li>' + str(list_char_name[i]) + ' ' + str(list_char_value[i])+'</li>')
     file.write('</ul>')
     file.close()
+    word_replace(file_path, 'demarreur', 'démarreur')
+    word_replace(file_path, 'filetes', 'filetés')
+    word_replace(file_path, 'Tention', 'Tension')
+    word_replace(file_path, 'qty.', 'qté.')
 
 
 def save_description_html(title, manufacturer, article, list_ref, list_producer, list_char_name, list_char_value, list_brand, list_model):
@@ -70,8 +98,8 @@ def save_description_html(title, manufacturer, article, list_ref, list_producer,
         index = list_char_name.index('Nombre de dents [ qty. ]')
         file.write(str(list_char_value[index]) + ' dents ')
 
-    if len(list_ref) >= 5:
-        for i in range(5):
+    if len(list_ref) >= 6:
+        for i in range(6):
             ref = list_ref[i]
             prod = list_producer[i]
             if prod in producer_dict:
@@ -87,10 +115,10 @@ def save_description_html(title, manufacturer, article, list_ref, list_producer,
             else:
                 producer_dict[prod] = [ref]
 
-    combined = [f"{prod} {' '.join(refs)}" for prod, refs in producer_dict.items()]
+    combined = [f"{prod} {', '.join(refs)}" for prod, refs in producer_dict.items()]
     result = ", ".join(combined)
     file.write(result)
-    file.write('</h3>')
+    file.write('<br>Livraison express 24h</h3>')
 
     file.write('<b>Les engagements AutoTruck42:</b><br>')
     file.write('<ul>')
@@ -131,7 +159,7 @@ def save_description_html(title, manufacturer, article, list_ref, list_producer,
     word_replace(file_path, 'qty.', 'qté.')
 
 
-def save_description_txt(title, manufacturer, article, ref_producer_list, char_table_name, char_table_value, row_brand_model):
+def save_description_txt(title, price, manufacturer, article, ref_producer_list, char_table_name, char_table_value, row_brand_model):
     list_ref = []
     list_producer = []
     list_char_name = []
@@ -191,8 +219,8 @@ def save_description_txt(title, manufacturer, article, ref_producer_list, char_t
     else:
         file.write(' ')
 
-    if len(list_ref) >= 5:
-        for i in range(5):
+    if len(list_ref) >= 6:
+        for i in range(6):
             ref = list_ref[i]
             prod = list_producer[i]
             if prod in producer_dict:
@@ -208,9 +236,10 @@ def save_description_txt(title, manufacturer, article, ref_producer_list, char_t
             else:
                 producer_dict[prod] = [ref]
 
-    combined = [f"{prod} {' '.join(refs)}" for prod, refs in producer_dict.items()]
+    combined = [f"{prod} {', '.join(refs)}" for prod, refs in producer_dict.items()]
     result = ", ".join(combined)
     file.write(result)
+    file.write('<br>Livraison express 24h</h3>')
 
     file.write('\n\nCaractéristique\n\n')
     file.write('Marque: ' + manufacturer + '\nQualité Premium\nNeuf\nGarantie 2 ans\n')
@@ -234,29 +263,31 @@ def save_description_txt(title, manufacturer, article, ref_producer_list, char_t
 
     save_characteristic_html(title, manufacturer, list_char_name, list_char_value)
     save_description_html(title, manufacturer, article, list_ref, list_producer, list_char_name, list_char_value, list_brand, list_model)
-    word_replace(os.path.join(directory, 'caractéristique.html'), 'demarreur', 'démarreur')
-    word_replace(os.path.join(directory, 'caractéristique.html'), 'filetes', 'filetés')
-    word_replace(os.path.join(directory, 'caractéristique.html'), 'Tention', 'Tension')
-    word_replace(os.path.join(directory, 'caractéristique.html'), 'qty.', 'qté.')
+    save_meta(title, price, article, list_ref, list_producer, list_char_name, list_char_value)
 
 
 def scrape(url):
     row_brand_model = []
     options = Options()
-
     options.add_argument("--headless")
+
+    profile_path = os.path.expanduser('~') + '\\AppData\\Local\\Google\\Chrome\\User Data\\'
+    options.add_argument(f"--user-data-dir={profile_path}")
+    profile_name = 'Default'
+    options.add_argument(f'--profile-directory={profile_name}')
 
     browser = webdriver.Chrome(options=options)
     browser.get(url)
-    sleep(2)
+    sleep(3)
 
     title = browser.find_element(By.CLASS_NAME, 'product-name').text
 
     manufacturer = browser.find_element(By.CSS_SELECTOR, '[itemprop="manufacturer"]').text
 
     images = browser.find_elements(By.CSS_SELECTOR, '[itemprop="image"]')
+    last_image = browser.find_element(By.CLASS_NAME, 'cat-image')
 
-    price = browser.find_element(By.CLASS_NAME, 'price-product')
+    price = browser.find_element(By.CLASS_NAME, 'price-loader').text
 
     article = browser.find_element(By.CLASS_NAME, 'categories').text
 
@@ -276,8 +307,8 @@ def scrape(url):
         for row in rows:
             row_brand_model.append(row.text)
 
-    save_description_txt(title, manufacturer, article, element_list, char_table_name, char_table_value, row_brand_model)
-    save_image(title, images, price)
+    save_description_txt(title, price, manufacturer, article, element_list, char_table_name, char_table_value, row_brand_model)
+    save_image(title, images, last_image)
     browser.quit()
 
 
