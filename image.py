@@ -6,17 +6,14 @@ from selenium.webdriver.common.by import By
 import requests
 
 
-def save_image(title, images, last_image):
+def save_image(title, images):
     directory = f'{title}/images'
     os.makedirs(directory, exist_ok=True)
-    fifth_image = last_image.find_element(By.TAG_NAME, 'img')
-    image = []
-    for i in images:
-        image.append(i.find_element(By.TAG_NAME, 'img'))
-    image.append(fifth_image)
+    image = images.find_elements(By.TAG_NAME, 'a')
+
     for idx, img in enumerate(image):
-        src = img.get_attribute('src')
-        if src:
-            img_data = requests.get(src).content
-            with open(f'{directory}/image_{idx}.jpg', 'wb') as img_file:
+        url = img.get_attribute('href')
+        if url:
+            img_data = requests.get(url).content
+            with open(f'{directory}/image_{idx}.png', 'wb') as img_file:
                 img_file.write(img_data)

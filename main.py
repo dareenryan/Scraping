@@ -54,7 +54,7 @@ def save_meta(title, price, article, list_ref, list_producer, list_char_name, li
     combined = [f"{prod} {', '.join(refs)}" for prod, refs in producer_dict.items()]
     result = ", ".join(combined)
     file.write(result)
-    file.write(' à ' + str(float(prix[0])*1.5) + prix[1])
+    file.write(' à ' + str(round(float(prix[0])*1.5, 4)) + prix[1])
     file.write(' sur notre boutique en ligne. Livraison express 24h')
     word_replace(file_path, 'Demarreur', 'Démarreur')
 
@@ -284,8 +284,7 @@ def scrape(url):
 
     manufacturer = browser.find_element(By.CSS_SELECTOR, '[itemprop="manufacturer"]').text
 
-    images = browser.find_elements(By.CSS_SELECTOR, '[itemprop="image"]')
-    last_image = browser.find_element(By.CLASS_NAME, 'cat-image')
+    images = browser.find_element(By.CLASS_NAME, 'images')
 
     price = browser.find_element(By.CLASS_NAME, 'price-loader').text
 
@@ -308,7 +307,7 @@ def scrape(url):
             row_brand_model.append(row.text)
 
     save_description_txt(title, price, manufacturer, article, element_list, char_table_name, char_table_value, row_brand_model)
-    save_image(title, images, last_image)
+    save_image(title, images)
     browser.quit()
 
 
