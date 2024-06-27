@@ -13,6 +13,7 @@ from selenium.webdriver.common.by import By
 # Other functions
 from image import save_image
 from word_replace import word_replace
+from forms import save_form
 
 
 def save_meta(title, price, article, list_ref, list_producer, list_char_name, list_char_value):
@@ -65,11 +66,11 @@ def save_characteristic_html(title, manufacturer, list_char_name, list_char_valu
     file_path = os.path.join(directory, 'caractéristique.html')
 
     file = open(file_path, 'w', encoding='utf-8')
-    file.write('<p><b>Caractéristiques:</b></p>')
-    file.write('<ul>')
-    file.write('<li>Marque: ' + manufacturer + '</li><li>Qualité Premium</li><li>Neuf</li><li>Garantie 2 ans</li>')
+    file.write('<p><b>Caractéristiques:</b></p>\n')
+    file.write('<ul>\n')
+    file.write('<li>Marque: ' + manufacturer + '</li>\n<li>Qualité Premium</li>\n<li>Neuf</li>\n<li>Garantie 2 ans</li>')
     for i in range(len(list_char_name)):
-        file.write('<li>' + str(list_char_name[i]) + ' ' + str(list_char_value[i])+'</li>')
+        file.write('<li>' + str(list_char_name[i]) + ' ' + str(list_char_value[i])+'</li>\n')
     file.write('</ul>')
     file.close()
     word_replace(file_path, 'demarreur', 'démarreur')
@@ -118,38 +119,38 @@ def save_description_html(title, manufacturer, article, list_ref, list_producer,
     combined = [f"{prod} {', '.join(refs)}" for prod, refs in producer_dict.items()]
     result = ", ".join(combined)
     file.write(result)
-    file.write('<br>Livraison express 24h</h3>')
+    file.write('<br>Livraison express 24h</h3>\n')
 
-    file.write('<b>Les engagements AutoTruck42:</b><br>')
-    file.write('<ul>')
-    file.write('<li>Boutique 100% française</li><li>Situé à Mably dans la Loire 42300</li>')
-    file.write('<li>Un professionnel au téléphone du Lundi au Vendredi 09h00/16h00</li>')
-    file.write('<li>Une livraison en 24/48h (Point relais, Express en 24h)</li>')
-    file.write('<li>Traitement de la commande le jour même avant 16 h00</li>')
-    file.write('<li>Une réponse à toutes vos en 2h Max de 9h00 à 16h00 et dans la journée 7jrs/7 de 6h00 à 22h00</li>')
-    file.write('<li>Des produits de qualité au normes FR & EU</li>')
-    file.write('<li>Garantie 2 ans</li>')
-    file.write('</ul>')
+    file.write('<b>Les engagements AutoTruck42:</b><br>\n')
+    file.write('<ul>\n')
+    file.write('<li>Boutique 100% française</li><li>Situé à Mably dans la Loire 42300</li>\n')
+    file.write('<li>Un professionnel au téléphone du Lundi au Vendredi 09h00/16h00</li>\n')
+    file.write('<li>Une livraison en 24/48h (Point relais, Express en 24h)</li>\n')
+    file.write('<li>Traitement de la commande le jour même avant 16 h00</li>\n')
+    file.write('<li>Une réponse à toutes vos en 2h Max de 9h00 à 16h00 et dans la journée 7jrs/7 de 6h00 à 22h00</li>\n')
+    file.write('<li>Des produits de qualité au normes FR & EU</li>\n')
+    file.write('<li>Garantie 2 ans</li>\n')
+    file.write('</ul>\n')
 
-    file.write('<br><b>Caractéristique</b><br>')
-    file.write('<ul>')
-    file.write('<li>Marque: ' + manufacturer + '</li><li>Qualité Premium</li>')
-    file.write('<li>Neuf</li><li>Garantie 2 ans</li>')
+    file.write('<br><b>Caractéristique</b><br>\n')
+    file.write('<ul>\n')
+    file.write('<li>Marque: ' + manufacturer + '</li>\n<li>Qualité Premium</li>\n')
+    file.write('<li>Neuf</li>\n<li>Garantie 2 ans</li>\n')
     for j in range(len(list_char_name)):
-        file.write('<li>' + str(list_char_name[j]) + ' ' + str(list_char_value[j]) + '</li>')
-    file.write('</ul>')
+        file.write('<li>' + str(list_char_name[j]) + ' ' + str(list_char_value[j]) + '</li>\n')
+    file.write('</ul>\n')
 
-    file.write('<br><b>Référence équivalente</b><br>')
-    file.write('<ul>')
+    file.write('<br><b>Référence équivalente</b><br>\n')
+    file.write('<ul>\n')
     for i in range(len(list_ref)):
-        file.write('<li>' + str(list_ref[i]) + ' ' + str(list_producer[i]) + '</li>')
-    file.write('</ul>')
+        file.write('<li>' + str(list_ref[i]) + ' ' + str(list_producer[i]) + '</li>\n')
+    file.write('</ul>\n')
 
-    file.write('<br><b>Compatible avec:</b><br>')
-    file.write('<ul>')
+    file.write('<br><b>Compatible avec:</b><br>\n')
+    file.write('<ul>\n')
     for k in range(len(list_brand)):
-        file.write('<li>' + str(list_brand[k]) + ' ' + str(list_model[k]) + '</li>')
-    file.write('</ul>')
+        file.write('<li>' + str(list_brand[k]) + ' ' + str(list_model[k]) + '</li>\n')
+    file.write('</ul>\n')
 
     file.close()
     word_replace(file_path, 'Demarreur', 'Démarreur')
@@ -159,19 +160,12 @@ def save_description_html(title, manufacturer, article, list_ref, list_producer,
     word_replace(file_path, 'qty.', 'qté.')
 
 
-def save_description_txt(title, price, manufacturer, article, ref_producer_list, char_table_name, char_table_value, row_brand_model):
-    list_ref = []
-    list_producer = []
+def save_description_txt(title, price, manufacturer, article, list_ref, list_producer, char_table_name, char_table_value, row_brand_model):
     list_char_name = []
     list_char_value = []
     big_list_brand = []
     big_list_model = []
     producer_dict = {}
-
-    # Nom de référence et numéro de référence
-    for element in ref_producer_list:
-        list_ref.append(element.find_element(By.TAG_NAME, 'a').text)
-        list_producer.append(element.find_element(By.CLASS_NAME, '_producer_1s9a0_56').text)
 
     # Nom de caractéristique
     for char_name in char_table_name:
@@ -239,7 +233,7 @@ def save_description_txt(title, price, manufacturer, article, ref_producer_list,
     combined = [f"{prod} {', '.join(refs)}" for prod, refs in producer_dict.items()]
     result = ", ".join(combined)
     file.write(result)
-    file.write('<br>Livraison express 24h</h3>')
+    file.write('\nLivraison express 24h')
 
     file.write('\n\nCaractéristique\n\n')
     file.write('Marque: ' + manufacturer + '\nQualité Premium\nNeuf\nGarantie 2 ans\n')
@@ -268,6 +262,8 @@ def save_description_txt(title, price, manufacturer, article, ref_producer_list,
 
 def scrape(url):
     row_brand_model = []
+    list_ref = []
+    list_producer = []
     options = Options()
     options.add_argument("--headless")
 
@@ -279,6 +275,8 @@ def scrape(url):
     browser = webdriver.Chrome(options=options)
     browser.get(url)
     sleep(3)
+
+    bar_code = browser.find_element(By.CSS_SELECTOR, '[itemprop="gtin13"]').text
 
     title = browser.find_element(By.CLASS_NAME, 'product-name').text
 
@@ -306,9 +304,14 @@ def scrape(url):
         for row in rows:
             row_brand_model.append(row.text)
 
-    save_description_txt(title, price, manufacturer, article, element_list, char_table_name, char_table_value, row_brand_model)
+    for element in element_list:
+        list_ref.append(element.find_element(By.TAG_NAME, 'a').text)
+        list_producer.append(element.find_element(By.CLASS_NAME, '_producer_1s9a0_56').text)
+
+    save_description_txt(title, price, manufacturer, article, list_ref, list_producer, char_table_name, char_table_value, row_brand_model)
     save_image(title, images)
     browser.quit()
+    save_form(bar_code, title, price)
 
 
 if __name__ == '__main__':
