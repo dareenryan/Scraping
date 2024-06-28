@@ -9,7 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver import Keys
 
 
-def save_form(bar_code, title, prix):
+def save_form(profile, bar_code, title, prix):
     result = open(f'{title}/{title}.txt', 'r', encoding='utf-8').readline()
     descript = open(f'{title}/description.html', 'r', encoding='utf-8').read()
     char = open(f'{title}/caractéristique.html', 'r', encoding='utf-8').read()
@@ -19,8 +19,7 @@ def save_form(bar_code, title, prix):
 
     profile_path = os.path.expanduser('~') + '\\AppData\\Local\\Google\\Chrome\\User Data\\'
     options.add_argument(f"--user-data-dir={profile_path}")
-    profile_name = 'Profile 2'
-    options.add_argument(f'--profile-directory={profile_name}')
+    options.add_argument(f'--profile-directory={profile}')
 
     browser = webdriver.Chrome(options=options)
     browser.get('https://autotruck42.com/at@42300/index.php/sell/catalog/products-v2/')
@@ -59,7 +58,7 @@ def save_form(bar_code, title, prix):
     browser.find_element(By.ID, 'product_details-tab-nav').click()
     sleep(2)
     ref = browser.find_element(By.ID, 'product_details_references_reference')
-    ref.send_keys(result)
+    ref.send_keys(title)
     code = browser.find_element(By.ID, 'product_details_references_ean_13')
     code.send_keys(bar_code)
 
@@ -68,17 +67,22 @@ def save_form(bar_code, title, prix):
     browser.execute_script("window.scrollBy(0,-600)")
     sleep(2)
     div_price = browser.find_element(By.CLASS_NAME, 'retail-price-tax-excluded')
-    price = div_price.find_element(By.TAG_NAME, 'input')
+    selling_price = div_price.find_element(By.TAG_NAME, 'input')
+    buying_price = browser.find_element(By.ID, 'product_pricing_wholesale_price')
 
-    price.click()
-    sleep(5)
-    price.clear()
-    sleep(2)
+    selling_price.click()
     for i in range(8):
-        price.send_keys(Keys.BACKSPACE)
+        selling_price.send_keys(Keys.BACKSPACE)
+
+    selling_price.send_keys(str(prix.split(' ')[0]))
     sleep(1)
-    price.send_keys(str(round(float(prix.split(' ')[0])*1.5, 4)))
-    sleep(2)
+
+    buying_price.click()
+    for i in range(8):
+        buying_price.send_keys(Keys.BACKSPACE)
+
+    buying_price.send_keys(str(prix.split(' ')[0]))
+    sleep(1)
 
     browser.find_element(By.ID, 'product_seo-tab-nav').click()
     sleep(3)

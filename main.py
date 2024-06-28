@@ -311,7 +311,7 @@ def scrape(url):
     save_description_txt(title, price, manufacturer, article, list_ref, list_producer, char_table_name, char_table_value, row_brand_model)
     save_image(title, images)
     browser.quit()
-    save_form(bar_code, title, price)
+    save_form(profile_name, bar_code, title, price)
 
 
 if __name__ == '__main__':
