@@ -9,6 +9,8 @@ import os
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait as wait
+from selenium.webdriver.support import expected_conditions as EC
 
 # Other functions
 from image import save_image
@@ -274,7 +276,8 @@ def scrape(url):
 
     browser = webdriver.Chrome(options=options)
     browser.get(url)
-    sleep(3)
+
+    wait(browser, 20).until(EC.text_to_be_present_in_element((By.CLASS_NAME, 'price-loader'), 'EUR'))
 
     bar_code = browser.find_element(By.CSS_SELECTOR, '[itemprop="gtin13"]').text
 
@@ -298,7 +301,7 @@ def scrape(url):
 
     for item in applications_list:
         item.click()
-        sleep(1)
+        sleep(2)
         brand_model = browser.find_element(By.CLASS_NAME, 'table-striped')
         rows = brand_model.find_elements(By.TAG_NAME, 'td')
         for row in rows:

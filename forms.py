@@ -26,7 +26,7 @@ def save_form(profile, bar_code, title, prix):
     sleep(2)
 
     browser.find_element(By.ID, 'page-header-desc-configuration-add').click()
-    sleep(4)
+    wait(browser, 15).until(EC.visibility_of_element_located((By.TAG_NAME, 'iframe')))
     browser.switch_to.frame(browser.find_element(By.TAG_NAME, 'iframe'))
     browser.find_element(By.ID, 'create_product_create').click()
     sleep(4)
