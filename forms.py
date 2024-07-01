@@ -9,19 +9,22 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver import Keys
 
 
-def save_form(profile, bar_code, title, prix):
+def save_form(browser, profile, bar_code, title, prix):
     result = open(f'{title}/{title}.txt', 'r', encoding='utf-8').readline()
     descript = open(f'{title}/description.html', 'r', encoding='utf-8').read()
     char = open(f'{title}/caractéristique.html', 'r', encoding='utf-8').read()
 
-    options = Options()
+    """options = Options()
     options.add_argument("start-maximized")
 
     profile_path = os.path.expanduser('~') + '\\AppData\\Local\\Google\\Chrome\\User Data\\'
     options.add_argument(f"--user-data-dir={profile_path}")
     options.add_argument(f'--profile-directory={profile}')
 
-    browser = webdriver.Chrome(options=options)
+    browser = webdriver.Chrome(options=options)"""
+
+    browser.execute_script("window.open('');")
+    browser.switch_to.window(browser.window_handles[-1])
     browser.get('https://autotruck42.com/at@42300/index.php/sell/catalog/products-v2/')
     sleep(2)
 
@@ -93,4 +96,4 @@ def save_form(profile, bar_code, title, prix):
 
     save_button = browser.find_element(By.ID, 'product_footer_save')
     wait(browser, 1200).until(EC.element_to_be_selected(save_button))
-    browser.quit()
+    # browser.quit()

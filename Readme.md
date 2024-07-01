@@ -16,4 +16,4 @@ Script Python pour effectuer du scraping sur des pages web d'articles de mécani
 * Pour savoir quel nom mettre, consulter ce dossier 
 **C:\Users\ *nom_utilisateur* \AppData\Local\Google\Chrome\User Data** dans votre ordinateur et n'oubliez pas de mettre votre nom d'utilisateur.
 4. Pour éxécuter il suffit d'entrer la commande suivante
->py main.py scrape 'url_page_web'
+>py main.py scrape url_page_web1,url_page_web2,url_page_web3

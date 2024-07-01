@@ -7,6 +7,7 @@ import os
 
 # Scraping libraries
 from selenium import webdriver
+from selenium.common import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait as wait
@@ -262,12 +263,13 @@ def save_description_txt(title, price, manufacturer, article, list_ref, list_pro
     save_meta(title, price, article, list_ref, list_producer, list_char_name, list_char_value)
 
 
-def scrape(url):
+def scrape(urls):
+    urls = urls.split(',')
     row_brand_model = []
     list_ref = []
     list_producer = []
     options = Options()
-    options.add_argument("--headless")
+    options.add_argument("start-maximized")
 
     profile_path = os.path.expanduser('~') + '\\AppData\\Local\\Google\\Chrome\\User Data\\'
     options.add_argument(f"--user-data-dir={profile_path}")
@@ -275,46 +277,54 @@ def scrape(url):
     options.add_argument(f'--profile-directory={profile_name}')
 
     browser = webdriver.Chrome(options=options)
-    browser.get(url)
 
-    wait(browser, 20).until(EC.text_to_be_present_in_element((By.CLASS_NAME, 'price-loader'), 'EUR'))
+    for url in urls:
+        browser.get(url)
+        wait(browser, 20).until(EC.text_to_be_present_in_element((By.CLASS_NAME, 'price-loader'), 'EUR'))
 
-    bar_code = browser.find_element(By.CSS_SELECTOR, '[itemprop="gtin13"]').text
+        bar_code = browser.find_element(By.CSS_SELECTOR, '[itemprop="gtin13"]').text
 
-    title = browser.find_element(By.CLASS_NAME, 'product-name').text
+        title = browser.find_element(By.CLASS_NAME, 'product-name').text
 
-    manufacturer = browser.find_element(By.CSS_SELECTOR, '[itemprop="manufacturer"]').text
+        manufacturer = browser.find_element(By.CSS_SELECTOR, '[itemprop="manufacturer"]').text
 
-    images = browser.find_element(By.CLASS_NAME, 'images')
+        # images = browser.find_element(By.CLASS_NAME, 'images')
 
-    price = browser.find_element(By.CLASS_NAME, 'price-loader').text
+        price = browser.find_element(By.CLASS_NAME, 'price-loader').text
 
-    article = browser.find_element(By.CLASS_NAME, 'categories').text
+        article = browser.find_element(By.CLASS_NAME, 'categories').text
 
-    element_list = browser.find_elements(By.CLASS_NAME, '_referenceRow_1s9a0_47')
+        try:
+            char_table = browser.find_element(By.CLASS_NAME, 'table-bordered')
+            char_table_name = char_table.find_elements(By.CSS_SELECTOR, '[style="width: 210px;"]')
+            char_table_value = char_table.find_elements(By.TAG_NAME, 'a')
+        except NoSuchElementException:
+            char_table_name = []
+            char_table_value = []
 
-    char_table = browser.find_element(By.CLASS_NAME, 'table-bordered')
-    char_table_name = char_table.find_elements(By.CSS_SELECTOR, '[style="width: 210px;"]')
-    char_table_value = char_table.find_elements(By.TAG_NAME, 'a')
+        try:
+            element_list = browser.find_elements(By.CLASS_NAME, '_referenceRow_1s9a0_47')
+            for element in element_list:
+                list_ref.append(element.find_element(By.TAG_NAME, 'a').text)
+                list_producer.append(element.find_element(By.CLASS_NAME, '_producer_1s9a0_56').text)
+        except NoSuchElementException:
+            pass
 
-    applications_list = browser.find_elements(By.CLASS_NAME, 'usage-el')
+        try:
+            applications_list = browser.find_elements(By.CLASS_NAME, 'usage-el')
+            for item in applications_list:
+                item.click()
+                sleep(2)
+                brand_model = browser.find_element(By.CLASS_NAME, 'table-striped')
+                rows = brand_model.find_elements(By.TAG_NAME, 'td')
+                for row in rows:
+                    row_brand_model.append(row.text)
+        except NoSuchElementException:
+            pass
 
-    for item in applications_list:
-        item.click()
-        sleep(2)
-        brand_model = browser.find_element(By.CLASS_NAME, 'table-striped')
-        rows = brand_model.find_elements(By.TAG_NAME, 'td')
-        for row in rows:
-            row_brand_model.append(row.text)
-
-    for element in element_list:
-        list_ref.append(element.find_element(By.TAG_NAME, 'a').text)
-        list_producer.append(element.find_element(By.CLASS_NAME, '_producer_1s9a0_56').text)
-
-    save_description_txt(title, price, manufacturer, article, list_ref, list_producer, char_table_name, char_table_value, row_brand_model)
-    save_image(title, images)
-    browser.quit()
-    save_form(profile_name, bar_code, title, price)
+        save_description_txt(title, price, manufacturer, article, list_ref, list_producer, char_table_name, char_table_value, row_brand_model)
+        # save_image(title, images)
+        save_form(browser, profile_name, bar_code, title, price)
 
 
 if __name__ == '__main__':
