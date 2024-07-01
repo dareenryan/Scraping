@@ -14,17 +14,6 @@ def save_form(browser, profile, bar_code, title, prix):
     descript = open(f'{title}/description.html', 'r', encoding='utf-8').read()
     char = open(f'{title}/caractéristique.html', 'r', encoding='utf-8').read()
 
-    """options = Options()
-    options.add_argument("start-maximized")
-
-    profile_path = os.path.expanduser('~') + '\\AppData\\Local\\Google\\Chrome\\User Data\\'
-    options.add_argument(f"--user-data-dir={profile_path}")
-    options.add_argument(f'--profile-directory={profile}')
-
-    browser = webdriver.Chrome(options=options)"""
-
-    browser.execute_script("window.open('');")
-    browser.switch_to.window(browser.window_handles[-1])
     browser.get('https://autotruck42.com/at@42300/index.php/sell/catalog/products-v2/')
     sleep(2)
 
@@ -37,7 +26,7 @@ def save_form(browser, profile, bar_code, title, prix):
     article = browser.find_element(By.ID, 'product_header_name_2')
     article.send_keys(title)
 
-    browser.execute_script("window.scrollBy(0,400)")
+    browser.execute_script("window.scrollBy(0,300)")
     sleep(2)
 
     browser.find_element(By.ID, 'mceu_0-button').click()
@@ -56,8 +45,8 @@ def save_form(browser, profile, bar_code, title, prix):
     browser.find_element(By.CLASS_NAME, 'mce-primary').click()
     sleep(2)
 
-    browser.execute_script("window.scrollBy(0,-600)")
-
+    browser.execute_script("window.scrollBy(0,-800)")
+    sleep(1)
     browser.find_element(By.ID, 'product_details-tab-nav').click()
     sleep(2)
     ref = browser.find_element(By.ID, 'product_details_references_reference')
@@ -66,9 +55,9 @@ def save_form(browser, profile, bar_code, title, prix):
     code.send_keys(bar_code)
 
     browser.find_element(By.ID, 'product_pricing-tab-nav').click()
-    sleep(2)
+
     browser.execute_script("window.scrollBy(0,-600)")
-    sleep(2)
+
     div_price = browser.find_element(By.CLASS_NAME, 'retail-price-tax-excluded')
     selling_price = div_price.find_element(By.TAG_NAME, 'input')
     buying_price = browser.find_element(By.ID, 'product_pricing_wholesale_price')
@@ -96,4 +85,5 @@ def save_form(browser, profile, bar_code, title, prix):
 
     save_button = browser.find_element(By.ID, 'product_footer_save')
     wait(browser, 1200).until(EC.element_to_be_selected(save_button))
-    # browser.quit()
+    browser.execute_script("window.open('');")
+    browser.switch_to.window(browser.window_handles[-1])
